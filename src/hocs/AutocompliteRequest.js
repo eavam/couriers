@@ -2,7 +2,7 @@ import React from 'react';
 import debounce from 'lodash.debounce';
 import api from '../api';
 
-class Autocomplite extends React.Component {
+class AutocompliteRequest extends React.Component {
   state = {
     loading: false,
     error: false,
@@ -26,4 +26,4 @@ class Autocomplite extends React.Component {
   }
 }
 
-export default Autocomplite;
+export default AutocompliteRequest;

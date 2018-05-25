@@ -1,8 +1,15 @@
 import { createAction, createReducer } from 'redux-act';
 
+export const fetchCountriesList = createAction(
+  'CourierFilters/fetchCountriesList',
+);
 export const setCountriesList = createAction('CourierFilters/setCountriesList');
-export const setCountry = createAction('CourierFilters/setCountry');
+
+export const fetchOfficesList = createAction('CourierFilters/fetchOfficesList');
 export const setOfficesList = createAction('CourierFilters/setOfficesList');
+
+export const setFilters = createAction('CourierFilters/setFilters');
+export const setCountry = createAction('CourierFilters/setCountry');
 export const setOffice = createAction('CourierFilters/setOffice');
 export const toggleActive = createAction(
   'CourierFilters/toggleActive',
@@ -15,13 +22,19 @@ const initialState = {
   officeCurrent: '',
   countriesList: [],
   officesList: [],
+  filters: {},
 };
 
 const reducer = {};
 
+reducer[setFilters] = (state, action) => ({
+  ...state,
+  filters: action,
+});
+
 reducer[setCountriesList] = (state, action) => ({
   ...state,
-  countryList: action,
+  countriesList: action,
 });
 
 reducer[setCountry] = (state, action) => ({

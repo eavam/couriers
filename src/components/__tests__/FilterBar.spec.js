@@ -1,12 +1,12 @@
 import React from 'react';
 import { shallow } from 'enzyme';
-import Filter from './Filter';
+import FilterBar from '../FilterBar';
 
 test('Filter с одним дочерним элементом', () => {
   const tree = shallow(
-    <Filter isOpen>
+    <FilterBar isOpen>
       <div id="testing">test</div>
-    </Filter>,
+    </FilterBar>,
   );
 
   expect(tree.contains(<div id="testing">test</div>)).toBeTruthy();
@@ -14,10 +14,10 @@ test('Filter с одним дочерним элементом', () => {
 
 test('Filter с двумя дочерними элементами', () => {
   const tree = shallow(
-    <Filter isOpen>
+    <FilterBar isOpen>
       <div id="testing">test</div>
       <div id="testing-2">test</div>
-    </Filter>,
+    </FilterBar>,
   );
 
   expect(tree.contains(<div id="testing">test</div>)).toBeTruthy();
@@ -26,9 +26,9 @@ test('Filter с двумя дочерними элементами', () => {
 
 test('Filter открывается по клику на кнопку', () => {
   const tree = shallow(
-    <Filter>
+    <FilterBar>
       <div id="testing">test</div>
-    </Filter>,
+    </FilterBar>,
   );
 
   expect(tree.contains(<div id="testing">test</div>)).toBeFalsy();
@@ -40,9 +40,9 @@ test('Filter открывается по клику на кнопку', () => {
 
 test('Filter скрывется по клику на кнопку', () => {
   const tree = shallow(
-    <Filter isOpen>
+    <FilterBar isOpen>
       <div id="testing">test</div>
-    </Filter>,
+    </FilterBar>,
   );
 
   expect(tree.contains(<div id="testing">test</div>)).toBeTruthy();

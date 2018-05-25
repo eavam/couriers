@@ -8,32 +8,26 @@ export const fetchCouriersList = createAction(
 );
 const initialState = {
   couriersList: [],
-  fetchingCouriers: false,
+  loading: false,
 };
 
 const reducer = {};
 
-reducer[setCouriersList] = (state, action) => ({
-  ...state,
-  couriersList: [...action],
-  fetchingCouriers: false,
-});
-
 reducer[addCouriersList] = (state, action) => ({
   ...state,
   couriersList: [...state.couriersList, ...action],
-  fetchingCouriers: false,
+  loading: false,
 });
 
 reducer[setCouriersList] = (state, action) => ({
   ...state,
   couriersList: [...state.couriersList, ...action],
-  fetchingCouriers: false,
+  loading: false,
 });
 
 reducer[fetchingCouriers] = state => ({
   ...state,
-  fetchingCouriers: true,
+  loading: true,
 });
 
 export default createReducer(reducer, initialState);

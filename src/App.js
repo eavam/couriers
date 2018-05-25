@@ -1,6 +1,6 @@
 import React, { Component, Fragment } from 'react';
 import { Menu } from 'antd';
-import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
+import { Route, Link } from 'react-router-dom';
 
 import 'ag-grid/dist/styles/ag-grid.css';
 import 'ag-grid/dist/styles/ag-theme-balham.css';
@@ -21,22 +21,20 @@ const Couriers = () => (
 class App extends Component {
   render() {
     return (
-      <Router>
-        <Fragment>
-          <Menu
-            theme="dark"
-            mode="horizontal"
-            // defaultSelectedKeys={['2']}
-            style={{ lineHeight: '40px' }}
-          >
-            <Menu.Item key="1">
-              <Link to="/couriers">Курьеры</Link>
-            </Menu.Item>
-          </Menu>
-          <Route exact path="/" component={() => <div />} />
-          <Route path="/couriers" component={Couriers} />
-        </Fragment>
-      </Router>
+      <Fragment>
+        <Menu
+          theme="dark"
+          mode="horizontal"
+          // defaultSelectedKeys={['2']}
+          style={{ lineHeight: '40px' }}
+        >
+          <Menu.Item key="1">
+            <Link to="/couriers">Курьеры</Link>
+          </Menu.Item>
+        </Menu>
+        <Route exact path="/" component={() => <div />} />
+        <Route path="/couriers" component={Couriers} />
+      </Fragment>
     );
   }
 }

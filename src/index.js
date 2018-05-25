@@ -3,6 +3,7 @@ import createSagaMiddleware from 'redux-saga';
 import { render } from 'react-dom';
 import { Provider } from 'react-redux';
 import { createStore, applyMiddleware } from 'redux';
+import { BrowserRouter as Router } from 'react-router-dom';
 import { composeWithDevTools } from 'redux-devtools-extension/logOnlyInProduction';
 
 import 'antd/dist/antd.css';
@@ -22,7 +23,9 @@ sagaMiddleware.run(sagas);
 
 render(
   <Provider store={store}>
-    <App />
+    <Router>
+      <App />
+    </Router>
   </Provider>,
   document.getElementById('root'),
 );

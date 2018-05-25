@@ -1,11 +1,20 @@
 import React from 'react';
-import { Checkbox, Row, Col, Spin } from 'antd';
+import { Checkbox, Spin } from 'antd';
 import { compose } from 'recompose';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
+import { Formik } from 'formik';
 
-import Autocomplite from '../hocs/Autocomplite';
-import { setCountry, setOffice, toggleActive } from '../ducks/CourierFilters';
+import FilterBar from './FilterBar';
+import CustomSelect from './CustomSelect';
+
+import {
+  setCountry,
+  setOffice,
+  toggleActive,
+  fetchCountriesList,
+  fetchOfficesList,
+} from '../ducks/CourierFilters';
 import {
   getCountries,
   getOffices,
@@ -13,7 +22,8 @@ import {
   getOffice,
   getOnlyActive,
 } from '../selectors/filters';
-import { Filter, Select } from '../ui';
+
+import { fetchCouriersList } from '../ducks/CourierContent';
 
 export const Filters = ({
   countries,
@@ -25,51 +35,62 @@ export const Filters = ({
   onChangeActive,
   onlyActive,
   style,
+  fetchCountries,
+  fetchOffices,
+  onSubmit,
 }) => (
-  <Filter isOpen style={style}>
-    <Autocomplite url="/countries" limit={100}>
-      {({ loading, fetching, data }) => (
-        <Select
+  <Formik onSubmit={onSubmit} initialValues={{}}>
+    {({ handleSubmit, handleReset, setFieldValue, values }) => (
+      <FilterBar
+        isOpen
+        style={style}
+        onSubmit={handleSubmit}
+        onReset={handleReset}
+      >
+        <CustomSelect
           allowClear
           showSearch
-          data={data}
+          data={countries}
           label="Страна"
           size="small"
           data-test="country"
           filterOption={false}
-          value={currentCountry}
-          onChange={onChangeCountry}
-          onSearch={fetching}
-          onFocus={fetching}
-          notFoundContent={loading ? <Spin size="small" /> : null}
+          value={values.countryId}
+          onChange={id => {
+            setFieldValue('countryId', id);
+            onChangeCountry(id);
+            if (!id) setFieldValue('officeId', '');
+          }}
+          onSearch={fetchCountries}
+          onFocus={fetchCountries}
+          notFoundContent={<Spin size="small" />}
         />
-      )}
-    </Autocomplite>
 
-    <Autocomplite url={`/countries/${currentCountry}/offices`} limit={100}>
-      {({ loading, fetching, data }) => (
-        <Select
+        <CustomSelect
           allowClear
           showSearch
-          disabled={!currentCountry}
-          data={data}
+          disabled={!values.countryId}
+          data={offices}
           label="Офис"
           data-test="office"
           size="small"
           filterOption={false}
-          value={currentOffice}
-          onChange={onChangeOffice}
-          onSearch={fetching}
-          onFocus={fetching}
-          notFoundContent={loading ? <Spin size="small" /> : null}
+          value={values.officeId}
+          onChange={id => setFieldValue('officeId', id)}
+          onSearch={fetchOffices}
+          onFocus={fetchOffices}
+          notFoundContent={<Spin size="small" />}
         />
-      )}
-    </Autocomplite>
 
-    <Checkbox checked={onlyActive} onChange={onChangeActive}>
-      Только активные
-    </Checkbox>
-  </Filter>
+        <Checkbox
+          checked={values.active}
+          onChange={event => setFieldValue('active', event.target.checked)}
+        >
+          Только активные
+        </Checkbox>
+      </FilterBar>
+    )}
+  </Formik>
 );
 
 const mapStateToProps = state => ({
@@ -83,9 +104,12 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch =>
   bindActionCreators(
     {
+      fetchCountries: fetchCountriesList,
+      fetchOffices: fetchOfficesList,
       onChangeCountry: setCountry,
       onChangeOffice: setOffice,
       onChangeActive: toggleActive,
+      onSubmit: fetchCouriersList,
     },
     dispatch,
   );
