@@ -8,21 +8,20 @@ import { Formik } from 'formik';
 import FilterBar from './FilterBar';
 import CustomSelect from './CustomSelect';
 
-import { setCourierFilters } from '../ducks/filters';
-import { fetchCountries, fetchOffices } from '../ducks/lists';
-import { getCountries, getOffices } from '../selectors/filters';
+import { setMacrozoneFilters } from '../ducks/filters';
+import { fetchCountries, fetchOffices, fetchLayers } from '../ducks/lists';
+import { getCountries, getOffices, getLayers } from '../selectors/filters';
 
 import AutoSave from '../hocs/AutoSave';
 
-export const CourierFilters = ({
-  countries,
-  onChangeCountry,
-  offices,
-  onChangeOffice,
-  onChangeActive,
+export const MacrozoneFilters = ({
   style,
+  countries,
+  offices,
+  layers,
   onSearchCountries,
   onSearchOffices,
+  onSearchLayers,
   onSubmit,
   onAutoSave,
   // filters,
@@ -71,11 +70,37 @@ export const CourierFilters = ({
             notFoundContent={<Spin size="small" />}
           />
 
+          <CustomSelect
+            showSearch
+            allowClear
+            mode="multiple"
+            data={layers}
+            label="Слой"
+            data-test="layaer"
+            size="small"
+            filterOption={false}
+            value={values.layers}
+            onChange={layers => setFieldValue('layers', layers)}
+            onSearch={onSearchLayers}
+            onFocus={onSearchLayers}
+            notFoundContent={<Spin size="small" />}
+          />
+
           <Checkbox
-            checked={values.active}
-            onChange={event => setFieldValue('active', event.target.checked)}
+            checked={values.courierIsEmpty}
+            onChange={event =>
+              setFieldValue('courierIsEmpty', event.target.checked)
+            }
           >
-            Только активные
+            Только без курьера
+          </Checkbox>
+          <Checkbox
+            checked={values.showDeleted}
+            onChange={event =>
+              setFieldValue('showDeleted', event.target.checked)
+            }
+          >
+            Показать удаленные
           </Checkbox>
         </FilterBar>
       </Fragment>
@@ -86,7 +111,7 @@ export const CourierFilters = ({
 const mapStateToProps = state => ({
   countries: getCountries(state),
   offices: getOffices(state),
-  // filters: getCountriesFilters(state),
+  layers: getLayers(state),
 });
 
 const mapDispatchToProps = dispatch =>
@@ -94,7 +119,8 @@ const mapDispatchToProps = dispatch =>
     {
       onSearchCountries: fetchCountries,
       onSearchOffices: fetchOffices,
-      onAutoSave: setCourierFilters,
+      onSearchLayers: fetchLayers,
+      onAutoSave: setMacrozoneFilters,
     },
     dispatch,
   );
@@ -106,4 +132,4 @@ const enhancer = compose(
   }),
 );
 
-export default enhancer(CourierFilters);
+export default enhancer(MacrozoneFilters);

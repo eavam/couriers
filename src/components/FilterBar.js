@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, isValidElement, Children } from 'react';
 import { Button, Row, Col } from 'antd';
 
 /**
@@ -46,9 +46,10 @@ class FilterBar extends Component {
                 gutter={8}
                 style={{ padding: '0.6rem 1rem', ...style }}
               >
-                {React.Children.map(children, child => (
-                  <Col span={4}>{child}</Col>
-                ))}
+                {Children.map(
+                  children,
+                  child => isValidElement(child) && <Col span={4}>{child}</Col>,
+                )}
               </Row>
             </Col>
             <Col span={4}>

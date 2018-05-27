@@ -1,32 +1,44 @@
 import React from 'react';
 import { Icon } from 'antd';
-import { compose, mapProps } from 'recompose';
+import { compose, withProps } from 'recompose';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
+import { shape, arrayOf, func } from 'prop-types';
 
-import { getCouriers, getCouriersLoading } from '../selectors/couriers';
-import { fetchCouriersList } from '../ducks/CourierContent';
+import api from '../api';
 import { openModal } from '../ducks/CourierEditModal';
 
 import Grid from './Grid';
+import { getCouriersFilters } from '../selectors/filters';
 
-const CourierContent = ({ style, couriers, columnDefs, fetching, loading }) => (
+const CourierContent = ({ style, columnDefs, fetching, couriersParams }) => (
   <Grid
     style={style}
     fetching={fetching}
-    loading={loading}
-    gridData={couriers}
+    fetchingParams={couriersParams}
     columnDefs={columnDefs}
   />
 );
 
+CourierContent.defaultProps = {
+  style: {},
+  fetching: () => {},
+  couriersParams: {},
+};
+
+CourierContent.propTypes = {
+  style: shape(),
+  columnDefs: arrayOf().isRequired,
+  fetching: func,
+  couriersParams: shape(),
+};
+
 const mapStateToProps = state => ({
-  couriers: getCouriers(state),
-  loading: getCouriersLoading(state),
+  couriersParams: getCouriersFilters(state),
 });
 
 const mapDispatchToProps = dispatch =>
-  bindActionCreators({ fetching: fetchCouriersList, openModal }, dispatch);
+  bindActionCreators({ openModal }, dispatch);
 
 const renderActive = ({ value }) => (value ? <Icon type="check" /> : '');
 const renderPhone = ({ value }) => {
@@ -38,32 +50,35 @@ const renderPhone = ({ value }) => {
   );
 };
 
-const mapColumnDefs = props => [
-  {
-    headerName: 'Активность',
-    field: 'active',
-    cellRendererFramework: renderActive,
-  },
-  {
-    headerName: 'ФИО',
-    field: 'name',
-    onCellClicked: event => props.openModal(event.data),
-  },
-  {
-    headerName: 'Номер телефона',
-    field: 'phone',
-    cellRendererFramework: renderPhone,
-  },
-  { headerName: 'Основной график работы', field: 'schedule' },
-  { headerName: 'Назначен макрозоне', field: 'macrozone' },
-];
+const mapColumnDefs = props => ({
+  columnDefs: [
+    {
+      headerName: 'Активность',
+      field: 'active',
+      cellRendererFramework: renderActive,
+    },
+    {
+      headerName: 'ФИО',
+      field: 'name',
+      onCellClicked: event => props.openModal(event.data),
+    },
+    {
+      headerName: 'Номер телефона',
+      field: 'phone',
+      cellRendererFramework: renderPhone,
+    },
+    { headerName: 'Основной график работы', field: 'schedule' },
+    { headerName: 'Назначен макрозоне', field: 'macrozone' },
+  ],
+});
 
 const enhancer = compose(
   connect(mapStateToProps, mapDispatchToProps),
-  mapProps(props => {
-    const columnDefs = mapColumnDefs(props);
-    return { ...props, columnDefs };
-  }),
+  withProps(mapColumnDefs),
+  withProps(() => ({
+    fetching: params =>
+      api.get('/couriers', { params }).then(data => data.data),
+  })),
 );
 
 export default enhancer(CourierContent);

@@ -1,68 +1,48 @@
 import React, { Component } from 'react';
 import { AgGridReact } from 'ag-grid-react';
 import { Spin } from 'antd';
-import api from '../api';
 import 'ag-grid-enterprise';
 
-const OverLay = () => <Spin size="small" />;
-
 class Grid extends Component {
-  componentDidUpdate() {
-    const { loading } = this.props;
-    if (!this.gridAPI) return;
-
-    if (loading) {
-      this.gridAPI.showLoadingOverlay();
-    } else {
-      this.gridAPI.hideOverlay();
-      this.gridAPI.ensureIndexVisible(this.lastRowIndex);
+  componentDidUpdate(prevProps) {
+    if (prevProps.fetchingParams !== this.props.fetchingParams) {
+      this.updateData();
     }
   }
-
-  getRowsProps = null;
-  gridAPI = null;
-  lastRowIndex = 0;
-
-  frameworkComponents = {
-    customLoadingOverlay: OverLay,
-  };
-
-  handleScroll = event => {
-    if (event.direction !== 'vertical') return;
-
-    const { fetching, gridData } = this.props;
-    this.lastRowIndex = this.gridAPI.getLastDisplayedRow();
-    if (gridData.length <= this.lastRowIndex + 1) fetching();
-  };
-
-  handelScrollChanged = () => {
-    this.gridAPI.setFocusedCell(this.lastRowIndex);
-  };
-
-  fetchData = params => {
-    const { fetching } = this.props;
-    this.gridAPI = params.api;
-
+  onGridReady = gridParam => {
+    this.gridApi = gridParam.api;
     // Делаем колонки по ширине станицы
-    this.gridAPI.sizeColumnsToFit();
-    fetching();
+    this.gridApi.sizeColumnsToFit();
+    this.updateData();
+  };
+
+  updateData = () => {
+    this.gridApi.setDatasource({
+      rowCount: null,
+      getRows: params => {
+        this.props.fetching(this.props.fetchingParams).then(data => {
+          params.successCallback(data, -1);
+        });
+      },
+    });
+  };
+
+  gridApi = null;
+  frameworkComponents = {
+    customLoadingOverlay: () => <Spin size="small" />,
   };
 
   render() {
-    const { style, columnDefs, gridData } = this.props;
+    const { style, columnDefs } = this.props;
+
     return (
       <div className="ag-theme-balham" style={style}>
         <AgGridReact
-          id="myGrid"
           enableColResize
           enableServerSideSorting
-          onBodyScroll={this.handleScroll}
-          onModelUpdated={this.handelScrollChanges}
+          rowModelType="infinite"
           columnDefs={columnDefs}
-          rowData={gridData}
-          frameworkComponents={this.frameworkComponents}
-          loadingOverlayComponent="customLoadingOverlay"
-          onGridReady={this.fetchData}
+          onGridReady={this.onGridReady}
         />
       </div>
     );
